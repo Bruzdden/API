@@ -1,81 +1,53 @@
 <?php
 
-$result = [
-    "result" => 0,
-];
+require "/function.php";
 
-
-$operation = filter_input(INPUT_GET, "operation");
-$nums = explode(",", filter_input(INPUT_GET, "num"));
+$result = [];
 $sum = 0;
 
-switch($operation)
-            {
-                case "add":
-                    if (count($nums) <= 1){
-                        $result = ["result" => "ERROR MORE"];
-                        break;
-                    }
-                    foreach ($nums as $num){
-                        if (!is_numeric($num)){
-                            $result = ["result" => "NO NUMBER EXIST"];
-                            break;
-                        }
-                        $sum += $num;
-                    }
-                    $result = ["result" => $sum];
-                break;
+$segments = explode("/", parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH));
 
-                case 'subtract':
-                    if (count($nums) <= 1){
-                        $result = ["result" => "ERROR MORE"];
-                        break;
-                    }
-                    foreach ($nums as $num){
-                        if (!is_numeric($num)){
-                            $result = ["result" => "NO NUMBER EXIST"];
-                            break;
-                        }
-                        $sum -= $num;
-                    }
-                    $result = ["result" => $sum];
-                break;
+$operation = $segments[1];
+$num = $segments[2];
 
-                case 'multiply':
-                    if (count($nums) <= 1){
-                        $result = ["result" => "ERROR MORE"];
-                        break;
-                    }
-                    foreach ($nums as $num){
-                        if (!is_numeric($num)){
-                            $result = ["result" => "NO NUMBER EXIST"];
-                            break;
-                        }
-                        $sum *= $num;
-                    }
-                    $result = ["result" => $sum];
-                break;
+$nums = explode("/", $num);
 
-                case 'divide':
-                    if (count($nums) <= 1){
-                        $result = ["result" => "ERROR MORE"];
-                        break;
-                    }
-                    foreach ($nums as $num){
-                        if (!is_numeric($num)){
-                            $result = ["result" => "NO NUMBER EXIST"];
-                            break;
-                        }
-                        $sum = $sum / $num;
-                    }
-                    $result = ["result" => $sum];
-                break;
+if (!valid_input($nums)) {
+    $result = ["result" => "ERROR INVALID INPUT"];
+    echo json_encode($result);
+    exit;
+}
 
-                default:
-                    $result = ["result" => "Error more"];
-            }
+switch ($operation) {
+    case "add":
+        foreach ($nums as $num) {
+            $sum += $num;
+        }
+        $result = ["result" => $sum];
+        break;
+    case "subtract":
+        foreach ($nums as $num) {
+            $sum -= $num;
+        }
+        $result = ["result" => $sum];
+        break;
+    case "times":
+        foreach ($nums as $num) {
+            $sum *= $num;
+        }
+        $result = ["result" => $sum];
+        break;
+    case "divide":
+        foreach ($nums as $num) {
+            $sum /= $num;
+        }
+        $result = ["result" => $sum];
+        break;
+    default:
+        $result = ["result" => "ERROR INVALID OPERATION"];
+        break;
+}
+
 echo json_encode($result);
 exit;
 
-
-?>
